@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: YAEGASHI Takeshi
+  description: A role which contains blockinfile module
+  license: GPLv3+
+  min_ansible_version: 1.2
+  categories:
+  - system
+dependencies: []
