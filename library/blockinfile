@@ -20,9 +20,9 @@ short_description: Insert/replace/remove a text block
 version_added: 0.0
 description:
   - This module will insert/replace/remove a block of multi-line text
-    surrounded by customizable maker lines
-    (default is "# {BEGIN/END} ANSIBLE MANAGED BLOCK").
-    Some functionality is taken from replace module by Evan Kaufman.
+    surrounded by customizable marker lines
+    (default\: "# {BEGIN/END} ANSIBLE MANAGED BLOCK").
+    Some functionality is taken from M(replace) module by Evan Kaufman.
 options:
   dest:
     required: true
@@ -76,9 +76,9 @@ EXAMPLES = r"""
         netmask 255.255.255.0"
 
 - blockinfile: |
-     dest=/var/www/index.html backup=yes
-     marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-     content="<h1>Welcome to {{ansible_hostname}}</h1>"
+    dest=/var/www/html/index.html backup=yes
+    marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    content="<h1>Welcome to {{ansible_hostname}}</h1>"
 """
 
 def write_changes(module,contents,dest):
@@ -145,8 +145,6 @@ def main():
     mfunc = lambda x: re.sub(r'{mark}', x, params['marker'], 0)
     markers = tuple(map(mfunc, ("BEGIN", "END")))
     markers_escaped = tuple(map(lambda x: re.escape(x), markers))
-    print markers
-    print markers_escaped
     if params['content'] == '':
         repl = ''
     else:
