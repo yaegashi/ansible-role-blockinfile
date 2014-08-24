@@ -5,6 +5,8 @@ This role contains no tasks, but provides blockinfile module
 which might be useful when you want to apply multi-line snippets
 in config files in /etc.
 
+Ansible Galaxy Page: [https://galaxy.ansible.com/list#/roles/1475](https://galaxy.ansible.com/list#/roles/1475)
+
 blockinfile Module
 ------------------
 

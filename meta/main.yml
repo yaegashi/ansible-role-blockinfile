@@ -1,7 +1,8 @@
 ---
 galaxy_info:
   author: YAEGASHI Takeshi
-  description: A role which contains blockinfile module
+  description: Contains blockinfile module
+               to insert/update/remove a text block surrounded by marker lines
   license: GPLv3+
   min_ansible_version: 1.2
   categories:

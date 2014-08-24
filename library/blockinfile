@@ -15,11 +15,11 @@ DOCUMENTATION = """
 ---
 module: blockinfile
 author: YAEGASHI Takeshi
-short_description: Insert/replace/remove a text block
+short_description: Insert/update/remove a text block
                    surrounded by marker lines.
 version_added: 0.0
 description:
-  - 'This module will insert/replace/remove a block of multi-line text
+  - 'This module will insert/update/remove a block of multi-line text
     surrounded by customizable marker lines
     (default: "# {BEGIN/END} ANSIBLE MANAGED BLOCK").
     Some functionality is taken from M(replace) module by Evan Kaufman.'
