@@ -21,7 +21,7 @@ version_added: 0.0
 description:
   - This module will insert/replace/remove a block of multi-line text
     surrounded by customizable maker lines
-    (default is "# ANSIBLE MANAGED BLOCK BEGIN/END").
+    (default is "# {BEGIN/END} ANSIBLE MANAGED BLOCK").
     Some functionality is taken from replace module by Evan Kaufman.
 options:
   dest:
@@ -31,7 +31,7 @@ options:
       - The file to modify.
   marker:
     required: false
-    default: "# ANSIBLE MANAGED BLOCK {mark}"
+    default: "# {mark} ANSIBLE MANAGED BLOCK"
     description:
       - The marker line template.
         "{mark}" will be replaced with "BEGIN" and "END".
@@ -77,7 +77,7 @@ EXAMPLES = r"""
 
 - blockinfile: |
      dest=/var/www/index.html backup=yes
-     marker="<!-- ANSIBLE MANAGED BLOCK {mark} -->"
+     marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
      content="<h1>Welcome to {{ansible_hostname}}</h1>"
 """
 
@@ -117,7 +117,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             dest=dict(required=True, aliases=['name', 'destfile']),
-            marker=dict(default='# ANSIBLE MANAGED BLOCK {mark}', type='str'),
+            marker=dict(default='# {mark} ANSIBLE MANAGED BLOCK', type='str'),
             content=dict(default='', type='str'),
             create=dict(default='no', choices=BOOLEANS, type='bool'),
             backup=dict(default='no', choices=BOOLEANS, type='bool'),

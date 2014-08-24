@@ -46,10 +46,10 @@ It will insert/update the following text block
 in /etc/ssh/sshd_config, then restart sshd if needed.
 
 ```
-# ANSIBLE MANAGED BLOCK BEGIN
+# BEGIN ANSIBLE MANAGED BLOCK
 Match User ansible-agent
 PasswordAuthentication no
-# ANSIBLE MANAGED BLOCK END
+# END ANSIBLE MANAGED BLOCK
 ```
 
 License
