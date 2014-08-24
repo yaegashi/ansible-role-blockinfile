@@ -12,6 +12,10 @@ blockinfile Module
 
 ### Options
 
+If this section doesn't show nicely in Ansible Galaxy Page,
+please refer to equeivalent in
+[GitHub Page](https://github.com/yaegashi/ansible-role-blockinfile#options).
+
 <table border=1 cellpadding=4>
 <tr>
 <th class="head">parameter</th>
@@ -101,6 +105,12 @@ Another task with alternative marker lines and variable substitution:
     marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
     content="<h1>Welcome to {{ansible_hostname}}</h1>"
 ```
+
+### TODO
+
+- Add insertafter/insertbefore options
+to insert a block at an arbitrary position.
+
 
 Requirements
 ------------
