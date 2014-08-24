@@ -5,24 +5,10 @@ This role contains no tasks, but provides blockinfile module
 which might be useful when you want to apply multi-line snippets
 in config files in /etc.
 
+blockinfile Module
+------------------
 
-Requirements
-------------
-
-None.
-
-Role Variables
---------------
-
-None.
-
-Dependencies
-------------
-
-None.
-
-blockinfile Module Options
---------------------------
+### Options
 
 <table border=1 cellpadding=4>
 <tr>
@@ -65,7 +51,7 @@ blockinfile Module Options
 <td>no</td>
 <td># {mark} ANSIBLE MANAGED BLOCK</td>
 <td><ul></ul></td>
-<td>The marker line template. "{mark}" will be replaced with "BEGIN" and "END".</td>
+<td>The marker line template. "{mark}" will be replaced with "BEGIN" or "END".</td>
 </tr>
 <tr>
 <td>others</td>
@@ -83,8 +69,7 @@ blockinfile Module Options
 </tr>
 </table>
 
-blockinfile Module Examples
----------------------------
+### Examples
 
 Simple task with YAML block literal:
 
@@ -114,6 +99,21 @@ Another task with alternative marker lines and variable substitution:
     marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
     content="<h1>Welcome to {{ansible_hostname}}</h1>"
 ```
+
+Requirements
+------------
+
+None.
+
+Role Variables
+--------------
+
+None.
+
+Dependencies
+------------
+
+None.
 
 Example Playbook
 ----------------

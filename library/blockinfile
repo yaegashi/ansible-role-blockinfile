@@ -34,7 +34,7 @@ options:
     default: "# {mark} ANSIBLE MANAGED BLOCK"
     description:
       - The marker line template.
-        "{mark}" will be replaced with "BEGIN" and "END".
+        "{mark}" will be replaced with "BEGIN" or "END".
   content:
     required: false
     default: ""
