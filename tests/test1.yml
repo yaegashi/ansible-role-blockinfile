@@ -1,0 +1,23 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing/test1"
+  roles:
+    - ../..
+  tasks:
+    - name: insert block
+      blockinfile: |
+        dest={{testing_dir}}/insert.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC"
+    - name: update block
+      blockinfile: |
+        dest={{testing_dir}}/update.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC"
+    - name: remove block
+      blockinfile: |
+        dest={{testing_dir}}/remove.txt backup=yes
+        content=""
+    - name: alternative marker
+      blockinfile: |
+       dest={{testing_dir}}/marker.txt backup=yes
+       marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+       content="<h2>aaa bbb ccc</h2>\n<h2>AAA BBB CCC</h2>"
