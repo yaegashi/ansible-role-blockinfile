@@ -1,0 +1,18 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing/test-follow"
+  roles:
+    - ../..
+  tasks:
+    - name: update symlink file without follow
+      blockinfile: |
+        dest={{testing_dir}}/link0.txt backup=yes follow=no
+        content="aaa bbb ccc\nAAA BBB CCC"
+    - name: update symlink file with follow=no
+      blockinfile: |
+        dest={{testing_dir}}/link1.txt backup=yes follow=no
+        content="aaa bbb ccc\nAAA BBB CCC"
+    - name: update symlink file with follow=yes
+      blockinfile: |
+        dest={{testing_dir}}/link2.txt backup=yes follow=yes
+        content="aaa bbb ccc\nAAA BBB CCC"
