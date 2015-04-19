@@ -53,6 +53,20 @@ please refer to equeivalent in
 <td>The file to modify.</td>
 </tr>
 <tr>
+<td>follow</td>
+<td>no</td>
+<td>no</td>
+<td><ul><li>yes</li><li>no</li></ul></td>
+<td>This flag indicates that filesystem links, if they exist, should be followed. (added in Ansible 1.8)</td>
+</tr>
+<tr>
+<td>group</td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td>name of the group that should own the file/directory, as would be fed to <em>chown</em></td>
+</tr>
+<tr>
 <td>marker</td>
 <td>no</td>
 <td># {mark} ANSIBLE MANAGED BLOCK</td>
@@ -60,11 +74,46 @@ please refer to equeivalent in
 <td>The marker line template. "{mark}" will be replaced with "BEGIN" or "END".</td>
 </tr>
 <tr>
-<td>others</td>
+<td>mode</td>
 <td>no</td>
 <td></td>
 <td><ul></ul></td>
-<td>All arguments accepted by the <span class='module'>file</span> module also work here.</td>
+<td>mode the file or directory should be, such as 0644 as would be fed to <em>chmod</em>. As of version 1.8, the mode may be specified as a symbolic mode (for example, <code>u+rwx</code> or <code>u=rw,g=r,o=r</code>).</td>
+</tr>
+<tr>
+<td>owner</td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td>name of the user that should own the file/directory, as would be fed to <em>chown</em></td>
+</tr>
+<tr>
+<td>selevel</td>
+<td>no</td>
+<td>s0</td>
+<td><ul></ul></td>
+<td>level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the <code>range</code>. <code>_default</code> feature works as for <em>seuser</em>.</td>
+</tr>
+<tr>
+<td>serole</td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td>role part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</td>
+</tr>
+<tr>
+<td>setype</td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td>type part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</td>
+</tr>
+<tr>
+<td>seuser</td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td>user part of SELinux file context. Will default to system policy, if applicable. If set to <code>_default</code>, it will use the <code>user</code> portion of the policy if available</td>
 </tr>
 <tr>
 <td>validate</td>
