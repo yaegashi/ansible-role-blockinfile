@@ -121,6 +121,7 @@ def main():
             content=dict(default='', type='str'),
             create=dict(default='no', choices=BOOLEANS, type='bool'),
             backup=dict(default='no', choices=BOOLEANS, type='bool'),
+            follow=dict(default='no', choices=BOOLEANS, type='bool'),
             validate=dict(default=None, type='str'),
         ),
         add_file_common_args=True,
@@ -129,6 +130,8 @@ def main():
 
     params = module.params
     dest = os.path.expanduser(params['dest'])
+    if module.boolean(params['follow']):
+        dest = os.path.realpath(dest)
 
     if os.path.isdir(dest):
         module.fail_json(rc=256, msg='Destination %s is a directory !' % dest)
