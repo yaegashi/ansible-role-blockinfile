@@ -33,7 +33,9 @@ run() {
 
 code=0
 
-for i in *.yml; do
+tests=${@-*.yml}
+
+for i in $tests; do
         echo
         echo "$i: Starting..."
         if ( run $i ); then
