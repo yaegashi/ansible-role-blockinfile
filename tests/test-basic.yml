@@ -18,6 +18,14 @@
         content=""
     - name: alternative marker
       blockinfile: |
-       dest={{testing_dir}}/marker.txt backup=yes
-       marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-       content="<h2>aaa bbb ccc</h2>\n<h2>AAA BBB CCC</h2>"
+        dest={{testing_dir}}/marker.txt backup=yes
+        marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+        content="<h2>aaa bbb ccc</h2>\n<h2>AAA BBB CCC</h2>"
+    - name: create a file, with options in a hash
+      blockinfile:
+        dest: "{{testing_dir}}/create.txt"
+        create: yes
+        content: |
+          iface eth0 inet static
+              address 192.168.0.1
+              netmask 255.255.255.0

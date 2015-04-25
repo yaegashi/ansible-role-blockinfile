@@ -84,16 +84,19 @@ extends_documentation_fragment: files
 EXAMPLES = r"""
 - blockinfile: dest=/etc/ssh/sshd_config content="Match User ansible-agent\nPasswordAuthentication no"
 
-- blockinfile: |
-    dest=/etc/network/interfaces backup=yes
-    content="iface eth0 inet static
-        address 192.168.0.1
-        netmask 255.255.255.0"
+- blockinfile:
+    dest: /etc/network/interfaces
+    backup: yes
+    content: |
+      iface eth0 inet static
+          address 192.168.0.1
+          netmask 255.255.255.0
 
 - blockinfile: |
     dest=/var/www/html/index.html backup=yes
     marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
     content="<h1>Welcome to {{ansible_hostname}}</h1>"
+    insertafter="<body>"
 """
 
 def write_changes(module,contents,dest):
