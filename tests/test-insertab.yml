@@ -1,0 +1,34 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing/test-basic"
+  roles:
+    - ../..
+  tasks:
+    - name: insert block after specific line
+      blockinfile: |
+        dest={{testing_dir}}/insertafter.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertafter=222
+    - name: insert block before specific line
+      blockinfile: |
+        dest={{testing_dir}}/insertbefore.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertbefore=222
+    - name: insert block at EOF
+      blockinfile: |
+        dest={{testing_dir}}/inserteof.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertafter=EOF
+    - name: insert block at BOF
+      blockinfile: |
+        dest={{testing_dir}}/insertbof.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertbefore=BOF
+    - name: insert block with unmatched regexp
+      blockinfile: |
+        dest={{testing_dir}}/insertunmatched.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertafter=999
+    - name: update block with insertafter ignored
+      blockinfile: |
+        dest={{testing_dir}}/updateafter.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertafter=222
+    - name: update block with insertbefore ignored
+      blockinfile: |
+        dest={{testing_dir}}/updatebefore.txt backup=yes
+        content="aaa bbb ccc\nAAA BBB CCC" insertbefore=222

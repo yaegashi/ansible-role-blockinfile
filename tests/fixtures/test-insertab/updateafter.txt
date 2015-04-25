@@ -1,0 +1,8 @@
+111 222 333
+# BEGIN ANSIBLE MANAGED BLOCK
+xxx yyy zzz
+XXX YYY ZZZ
+# END ANSIBLE MANAGED BLOCK
+!!! @@@ ###
+111 222 333
+!!! @@@ ###

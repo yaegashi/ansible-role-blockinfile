@@ -1,0 +1,8 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+aaa bbb ccc
+AAA BBB CCC
+# END ANSIBLE MANAGED BLOCK
+111 222 333
+!!! @@@ ###
+111 222 333
+!!! @@@ ###
