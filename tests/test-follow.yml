@@ -1,6 +1,6 @@
 - hosts: localhost
   vars:
-    - testing_dir: "{{playbook_dir}}/testing/test-follow"
+    - testing_dir: "{{playbook_dir}}/testing"
   roles:
     - ../..
   tasks:
