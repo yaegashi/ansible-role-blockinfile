@@ -1,0 +1,21 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing"
+  roles:
+    - ../..
+  tasks:
+    - name: insert a newline after <body>
+      replace:
+        dest: "{{testing_dir}}/index.html"
+        backup: yes
+        regexp: (?i)(<body>)(?=.)
+        replace: \1\n
+    - name: insert a block after <body>
+      blockinfile:
+        dest: "{{testing_dir}}/index.html"
+        backup: yes
+        marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+        content: |
+          <h2>aaa bbb ccc</h2>
+          <h2>AAA BBB CCC</h2>
+        insertafter: (?i)<body>
