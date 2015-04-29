@@ -150,7 +150,7 @@ def main():
 
     params = module.params
     dest = os.path.expanduser(params['dest'])
-    if module.boolean(params['follow']):
+    if module.boolean(params.get('follow', None)):
         dest = os.path.realpath(dest)
 
     if os.path.isdir(dest):
