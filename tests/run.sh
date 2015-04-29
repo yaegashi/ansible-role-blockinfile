@@ -13,10 +13,17 @@ run() {
         testing_dir="$PWD/testing/$base"
         expected_dir="$PWD/expected/$base"
         idlog="$PWD/testing/$base-id.log"
+        skipped="$testing_dir/SKIPPED"
         echo "$p: Running ansible-playbook"
         if ! ansible-playbook -v -i hosts -e testing_dir=$testing_dir $p; then
-                echo "$p: ansible-playbook failed"
-                exit 1
+                echo -n "$p: "
+                if test -e $skipped; then
+                        cat $skipped
+                        exit 2
+                else
+                        echo "ansible-playbook failed"
+                        exit 1
+                fi
         fi
         echo "$p: Running ansible-playbook again"
         ansible-playbook -v -i hosts -e testing_dir=$testing_dir $p | tee $idlog
@@ -40,6 +47,8 @@ for i in $tests; do
         echo "$i: Starting..."
         if ( run $i ); then
                 echo "$i: Passed"
+        elif test $? = 2; then
+                echo "$i: Skipped"
         else
                 echo "$i: Failed"
                 code=1

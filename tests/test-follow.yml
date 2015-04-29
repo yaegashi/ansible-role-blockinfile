@@ -4,6 +4,9 @@
   roles:
     - ../..
   tasks:
+    - shell: echo "Detected Ansible prior to 1.8" > {{testing_dir}}/SKIPPED
+             && false
+      when: ansible_version is not defined
     - name: update symlink file without follow
       blockinfile: |
         dest={{testing_dir}}/link0.txt backup=yes follow=no
