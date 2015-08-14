@@ -1,0 +1,16 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing"
+  roles:
+    - ../..
+  tasks:
+    - name: insert a block using block
+      blockinfile:
+        dest: "{{testing_dir}}/block.txt"
+        backup: yes
+        block: aaa bbb ccc
+    - name: insert a block using block
+      blockinfile:
+        dest: "{{testing_dir}}/content.txt"
+        backup: yes
+        content: aaa bbb ccc

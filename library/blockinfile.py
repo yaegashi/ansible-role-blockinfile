@@ -1,11 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Ansible blockinfile module
-#
-# Licensed under GPL version 3 or later
 # (c) 2014, 2015 YAEGASHI Takeshi <yaegashi@debian.org>
-# (c) 2013 Evan Kaufman <evan@digitalflophouse.com>
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 import os
@@ -14,33 +25,37 @@ import tempfile
 DOCUMENTATION = """
 ---
 module: blockinfile
-author: YAEGASHI Takeshi
+author:
+    - 'YAEGASHI Takeshi (@yaegashi)'
+extends_documentation_fragment:
+    - files
+    - validate
 short_description: Insert/update/remove a text block
                    surrounded by marker lines.
-version_added: 0.0
+version_added: '2.0'
 description:
   - 'This module will insert/update/remove a block of multi-line text
     surrounded by customizable marker lines
-    (default: "# {BEGIN/END} ANSIBLE MANAGED BLOCK").
-    Some functionality is taken from M(replace) module by Evan Kaufman.'
+    (default: "# {BEGIN/END} ANSIBLE MANAGED BLOCK").'
 options:
   dest:
-    required: true
     aliases: [ name, destfile ]
+    required: true
     description:
       - The file to modify.
   marker:
     required: false
-    default: "# {mark} ANSIBLE MANAGED BLOCK"
+    default: '# {mark} ANSIBLE MANAGED BLOCK'
     description:
       - The marker line template.
         "{mark}" will be replaced with "BEGIN" or "END".
-  content:
+  block:
+    aliases: [ content ]
     required: false
-    default: ""
+    default: ''
     description:
       - The text to insert inside the marker lines.
-        If it's empty string, marker lines will also be removed.
+        If it's an empty string, the marker lines will also be removed.
   insertafter:
     required: false
     default: EOF
@@ -52,6 +67,7 @@ options:
     choices: [ 'EOF', '*regex*' ]
   insertbefore:
     required: false
+    default: null
     description:
       - If specified, the block will be inserted before the last match of
         specified regular expression. A special value is available; C(BOF) for
@@ -61,42 +77,46 @@ options:
     choices: [ 'BOF', '*regex*' ]
   create:
     required: false
-    default: "no"
-    choices: [ "yes", "no" ]
+    default: 'no'
+    choices: [ 'yes', 'no' ]
     description:
       - Create a new file if it doesn't exist.
   backup:
     required: false
-    default: "no"
-    choices: [ "yes", "no" ]
+    default: 'no'
+    choices: [ 'yes', 'no' ]
     description:
       - Create a backup file including the timestamp information so you can
         get the original file back if you somehow clobbered it incorrectly.
-  validate:
-    required: false
-    description:
-      - validation to run before copying into place
-    required: false
-    default: None
-extends_documentation_fragment: files
 """
 
 EXAMPLES = r"""
-- blockinfile: dest=/etc/ssh/sshd_config content="Match User ansible-agent\nPasswordAuthentication no"
+- name: insert/update "Match User" configuation block in /etc/ssh/sshd_config
+  blockinfile: dest=/etc/ssh/sshd_config block="Match User ansible-agent\nPasswordAuthentication no"
 
-- blockinfile:
+- name: insert/update eth0 configuration stanza in /etc/network/interfaces
+        (it might be better to copy files into /etc/network/interfaces.d/)
+  blockinfile:
     dest: /etc/network/interfaces
-    backup: yes
-    content: |
+    block: |
       iface eth0 inet static
           address 192.168.0.1
           netmask 255.255.255.0
 
-- blockinfile: |
-    dest=/var/www/html/index.html backup=yes
-    marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-    content="<h1>Welcome to {{ansible_hostname}}</h1>"
-    insertafter="<body>"
+- name: insert/update HTML surrounded by custom markers after <body> line
+  blockinfile:
+    dest: /var/www/html/index.html
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    content: |
+      <h1>Welcome to {{ansible_hostname}}</h1>
+      <p>Last updated on {{ansible_date_time.iso8601}}</p>
+
+- name: remove HTML as well as surrounding markers
+  blockinfile:
+    dest: /var/www/html/index.html
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    content: ""
 """
 
 def write_changes(module,contents,dest):
@@ -136,11 +156,11 @@ def main():
         argument_spec=dict(
             dest=dict(required=True, aliases=['name', 'destfile']),
             marker=dict(default='# {mark} ANSIBLE MANAGED BLOCK', type='str'),
-            content=dict(default='', type='str'),
+            block=dict(default='', type='str', aliases=['content']),
             insertafter=dict(default=None),
             insertbefore=dict(default=None),
-            create=dict(default='no', choices=BOOLEANS, type='bool'),
-            backup=dict(default='no', choices=BOOLEANS, type='bool'),
+            create=dict(default=False, type='bool'),
+            backup=dict(default=False, type='bool'),
             validate=dict(default=None, type='str'),
         ),
         mutually_exclusive=[['insertbefore', 'insertafter']],
@@ -169,7 +189,7 @@ def main():
 
     insertbefore = params['insertbefore']
     insertafter = params['insertafter']
-    content = params['content']
+    block = params['block']
     marker = params['marker']
 
     if insertbefore is None and insertafter is None:
@@ -184,11 +204,11 @@ def main():
 
     marker0 = re.sub(r'{mark}', 'BEGIN', marker, 0)
     marker1 = re.sub(r'{mark}', 'END', marker, 0)
-    if content in (None, ''):
-        contentlines = []
+    if block in (None, ''):
+        blocklines = []
     else:
-        content = re.sub('', content, '', 0)
-        contentlines = [marker0] + content.splitlines() + [marker1]
+        block = re.sub('', block, '', 0)
+        blocklines = [marker0] + block.splitlines() + [marker1]
 
     n0 = n1 = None
     for i, line in enumerate(lines):
@@ -214,16 +234,19 @@ def main():
         lines[n1:n0+1] = []
         n0 = n1
 
-    lines[n0:n0] = contentlines
+    lines[n0:n0] = blocklines
 
-    result = '\n'.join(lines)+'\n' if lines else ''
+    if lines:
+        result = '\n'.join(lines)+'\n'
+    else:
+        result = ''
     if original == result:
         msg = ''
         changed = False
     elif original is None:
         msg = 'File created'
         changed = True
-    elif not contentlines:
+    elif not blocklines:
         msg = 'Block removed'
         changed = True
     else:
@@ -238,7 +261,8 @@ def main():
     msg, changed = check_file_attrs(module, changed, msg)
     module.exit_json(changed=changed, msg=msg)
 
-# this is magic, see lib/ansible/module_common.py
-#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
-
-main()
+# import module snippets
+from ansible.module_utils.basic import *
+from ansible.module_utils.splitter import *
+if __name__ == '__main__':
+    main()
