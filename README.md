@@ -1,156 +1,28 @@
 # Ansible Role: blockinfile
 
 This role contains no tasks, but provides blockinfile module
-which might be useful when you want to apply multi-line snippets
+which might be useful when you want to maintain multi-line snippets
 in config files in /etc.
 
 Ansible Galaxy Page: [https://galaxy.ansible.com/list#/roles/1475](https://galaxy.ansible.com/list#/roles/1475)
 
 ## blockinfile Module
 
-### Options
+This module will insert/update/remove a block of multi-line text
+surrounded by the marker lines.
 
-If this section doesn't show nicely in Ansible Galaxy Page,
-please refer to equeivalent in
-[GitHub Page](https://github.com/yaegashi/ansible-role-blockinfile#options).
-
-> <table border=1 cellpadding=4>
-> <tr>
-> <th class="head">parameter</th>
-> <th class="head">required</th>
-> <th class="head">default</th>
-> <th class="head">choices</th>
-> <th class="head">comments</th>
-> </tr>
-> <tr>
-> <td>backup</td>
-> <td>no</td>
-> <td>no</td>
-> <td><ul><li>yes</li><li>no</li></ul></td>
-> <td>Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.</td>
-> </tr>
-> <tr>
-> <td>content</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>The text to insert inside the marker lines. If it's empty string, marker lines will also be removed.</td>
-> </tr>
-> <tr>
-> <td>create</td>
-> <td>no</td>
-> <td>no</td>
-> <td><ul><li>yes</li><li>no</li></ul></td>
-> <td>Create a new file if it doesn't exist.</td>
-> </tr>
-> <tr>
-> <td>dest</td>
-> <td>yes</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>The file to modify.</td>
-> </tr>
-> <tr>
-> <td>follow</td>
-> <td>no</td>
-> <td>no</td>
-> <td><ul><li>yes</li><li>no</li></ul></td>
-> <td>This flag indicates that filesystem links, if they exist, should be followed. (added in Ansible 1.8)</td>
-> </tr>
-> <tr>
-> <td>group</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>name of the group that should own the file/directory, as would be fed to <em>chown</em></td>
-> </tr>
-> <tr>
-> <td>insertafter</td>
-> <td>no</td>
-> <td>EOF</td>
-> <td><ul><li>EOF</li><li>*regex*</li></ul></td>
-> <td>If specified, the block will be inserted after the last match of specified regular expression. A special value is available; <code>EOF</code> for inserting the block at the end of the file.  If specified regular expresion has no matches, EOF will be used instead.</td>
-> </tr>
-> <tr>
-> <td>insertbefore</td>
-> <td>no</td>
-> <td></td>
-> <td><ul><li>BOF</li><li>*regex*</li></ul></td>
-> <td>If specified, the block will be inserted before the last match of specified regular expression. A special value is available; <code>BOF</code> for inserting the block at the beginning of the file.  If specified regular expresion has no matches, the block will be inserted at the end of the file.</td>
-> </tr>
-> <tr>
-> <td>marker</td>
-> <td>no</td>
-> <td># {mark} ANSIBLE MANAGED BLOCK</td>
-> <td><ul></ul></td>
-> <td>The marker line template. "{mark}" will be replaced with "BEGIN" or "END".</td>
-> </tr>
-> <tr>
-> <td>mode</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>mode the file or directory should be, such as 0644 as would be fed to <em>chmod</em>. As of version 1.8, the mode may be specified as a symbolic mode (for example, <code>u+rwx</code> or <code>u=rw,g=r,o=r</code>).</td>
-> </tr>
-> <tr>
-> <td>owner</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>name of the user that should own the file/directory, as would be fed to <em>chown</em></td>
-> </tr>
-> <tr>
-> <td>selevel</td>
-> <td>no</td>
-> <td>s0</td>
-> <td><ul></ul></td>
-> <td>level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the <code>range</code>. <code>_default</code> feature works as for <em>seuser</em>.</td>
-> </tr>
-> <tr>
-> <td>serole</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>role part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</td>
-> </tr>
-> <tr>
-> <td>setype</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>type part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</td>
-> </tr>
-> <tr>
-> <td>seuser</td>
-> <td>no</td>
-> <td></td>
-> <td><ul></ul></td>
-> <td>user part of SELinux file context. Will default to system policy, if applicable. If set to <code>_default</code>, it will use the <code>user</code> portion of the policy if available</td>
-> </tr>
-> <tr>
-> <td>validate</td>
-> <td>no</td>
-> <td>None</td>
-> <td><ul></ul></td>
-> <td>validation to run before copying into place</td>
-> </tr>
-> </table>
-
-### Examples
-
-Simple task passing module options in a hash, including YAML block literal:
+Example task:
 
 ```yaml
 - blockinfile:
     dest: /etc/network/interfaces
-    backup: yes
-    content: |
+    block: |
       iface eth0 inet static
           address 192.168.0.1
           netmask 255.255.255.0
 ```
 
-It will insert/update the following text block in /etc/network/interfaces:
+Text inserted/updated by the task in /etc/network/interfaces:
 
 ```
 # BEGIN ANSIBLE MANAGED BLOCK
@@ -160,14 +32,161 @@ iface eth0 inet static
 # END ANSIBLE MANAGED BLOCK
 ```
 
-Another task with alternative marker lines and variable substitution:
+It uses marker lines `# {BEGIN/END} ANSIBLE MANAGED BLOCK` as default.
+You can specify alternative marker lines by `marker` option
+when you need to update files in other formats like HTML,
+or run multiple blockinfile tasks on the same file.
+
+### Options
+
+If this section doesn't show nicely in Ansible Galaxy Page,
+please refer to equivalent in
+[GitHub Page](https://github.com/yaegashi/ansible-role-blockinfile#options).
+
+> <table border=1 cellpadding=4>
+<tr>
+<th class="head">parameter</th>
+<th class="head">required</th>
+<th class="head">default</th>
+<th class="head">choices</th>
+<th class="head">comments</th>
+</tr>
+<tr>
+<td>backup<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>no</td>
+<td><ul><li>yes</li><li>no</li></ul></td>
+<td><div>Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.</div></td></tr>
+<tr>
+<td>block<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>The text to insert inside the marker lines. If it's an empty string, the marker lines will also be removed.</div></br>
+<div style="font-size: small;">aliases: content<div></td></tr>
+<tr>
+<td>create<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>no</td>
+<td><ul><li>yes</li><li>no</li></ul></td>
+<td><div>Create a new file if it doesn't exist.</div></td></tr>
+<tr>
+<td>dest<br/><div style="font-size: small;"></div></td>
+<td>yes</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>The file to modify.</div></br>
+<div style="font-size: small;">aliases: name, destfile<div></td></tr>
+<tr>
+<td>follow<br/><div style="font-size: small;"> (added in 1.8)</div></td>
+<td>no</td>
+<td>no</td>
+<td><ul><li>yes</li><li>no</li></ul></td>
+<td><div>This flag indicates that filesystem links, if they exist, should be followed.</div></td></tr>
+<tr>
+<td>group<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>name of the group that should own the file/directory, as would be fed to <em>chown</em></div></td></tr>
+<tr>
+<td>insertafter<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>EOF</td>
+<td><ul><li>EOF</li><li>*regex*</li></ul></td>
+<td><div>If specified, the block will be inserted after the last match of specified regular expression. A special value is available; <code>EOF</code> for inserting the block at the end of the file.  If specified regular expresion has no matches, EOF will be used instead.</div></td></tr>
+<tr>
+<td>insertbefore<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul><li>BOF</li><li>*regex*</li></ul></td>
+<td><div>If specified, the block will be inserted before the last match of specified regular expression. A special value is available; <code>BOF</code> for inserting the block at the beginning of the file.  If specified regular expresion has no matches, the block will be inserted at the end of the file.</div></td></tr>
+<tr>
+<td>marker<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td># {mark} ANSIBLE MANAGED BLOCK</td>
+<td><ul></ul></td>
+<td><div>The marker line template. "{mark}" will be replaced with "BEGIN" or "END".</div></td></tr>
+<tr>
+<td>mode<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>mode the file or directory should be. For those used to <em>/usr/bin/chmod</em> remember that modes are actually octal numbers (like 0644). Leaving off the leading zero will likely have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, <code>u+rwx</code> or <code>u=rw,g=r,o=r</code>).</div></td></tr>
+<tr>
+<td>owner<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>name of the user that should own the file/directory, as would be fed to <em>chown</em></div></td></tr>
+<tr>
+<td>selevel<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>s0</td>
+<td><ul></ul></td>
+<td><div>level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the <code>range</code>. <code>_default</code> feature works as for <em>seuser</em>.</div></td></tr>
+<tr>
+<td>serole<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>role part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</div></td></tr>
+<tr>
+<td>setype<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>type part of SELinux file context, <code>_default</code> feature works as for <em>seuser</em>.</div></td></tr>
+<tr>
+<td>seuser<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+<td><ul></ul></td>
+<td><div>user part of SELinux file context. Will default to system policy, if applicable. If set to <code>_default</code>, it will use the <code>user</code> portion of the policy if available</div></td></tr>
+<tr>
+<td>validate<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>None</td>
+<td><ul></ul></td>
+<td><div>The validation command to run before copying into place. The path to the file to validate is passed in via '%s' which must be present as in the example below. The command is passed securely so shell features like expansion and pipes won't work.</div></td></tr>
+</table>
+</br>
+
+### Examples
 
 ```yaml
-- blockinfile: |
-    dest=/var/www/html/index.html backup=yes
-    marker="<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-    content="<h1>Welcome to {{ansible_hostname}}</h1>"
-    insertafter="<body>"
+- name: insert/update "Match User" configuation block in /etc/ssh/sshd_config
+  blockinfile: dest=/etc/ssh/sshd_config block="Match User ansible-agent\nPasswordAuthentication no"
+```
+
+```yaml
+- name: insert/update eth0 configuration stanza in /etc/network/interfaces
+        (it might be better to copy files into /etc/network/interfaces.d/)
+  blockinfile:
+    dest: /etc/network/interfaces
+    block: |
+      iface eth0 inet static
+          address 192.168.0.1
+          netmask 255.255.255.0
+```
+
+```yaml
+- name: insert/update HTML surrounded by custom markers after <body> line
+  blockinfile:
+    dest: /var/www/html/index.html
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    insertafter: "<body>"
+    content: |
+      <h1>Welcome to {{ansible_hostname}}</h1>
+      <p>Last updated on {{ansible_date_time.iso8601}}</p>
+```
+
+```yaml
+- name: remove HTML as well as surrounding markers
+  blockinfile:
+    dest: /var/www/html/index.html
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    content: ""
 ```
 
 ## Requirements
