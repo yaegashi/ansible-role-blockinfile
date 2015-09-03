@@ -1,6 +1,10 @@
-# Hacking blockinfile role/module
+# Contributing to blockinfile role/module
 
-## Module testing infrastructure
+If you're going to contribute and make a pull request in the GitHub project,
+please consider including some tests for features/fixes
+you want to add in the PR.
+
+# Module testing infrastructure
 
 Run `bash run.sh` in tests dir.
 It copies fixtures dir to testing (working) dir,
@@ -13,8 +17,3 @@ You can add your own tests by adding the following files and dirs:
 - tests/fixtures/test-the-feature/... - Put fixtures to be tested.
 - tests/expected/test-the-feature/... - Put expected results after running playbook.
 
-## Contributing
-
-If you're going to contribute and make a pull request in the GitHub project,
-please consider including some tests for features/fixes
-you want to add in the PR.
