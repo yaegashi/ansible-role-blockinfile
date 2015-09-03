@@ -6,6 +6,20 @@ in config files in /etc.
 
 Ansible Galaxy Page: [https://galaxy.ansible.com/list#/roles/1475](https://galaxy.ansible.com/list#/roles/1475)
 
+**Request for review:**
+[The pull request to ansible-modules-extras](https://github.com/ansible/ansible-modules-extras/pull/832)
+has been made to include blockinfile module
+in the official distribution of Ansible,
+which enables you to use blockinfile as a standard module without this role!
+
+If you use this module and feel it's useful,
+please leave some endorsement comments on the PR.
+I greatly appreciate if you're
+[an eligible reviewer (existing module author)](https://github.com/ansible/ansible-modules-extras/blob/devel/REVIEWERS.md)
+and could take some time to review the PR,
+otherwise if you could ask reviewers of your acquiaintance for the review.
+It needs two +1 votes from reviewers in order to be nominated for inclusion.
+
 ## blockinfile Module
 
 This module will insert/update/remove a block of multi-line text
