@@ -76,7 +76,7 @@ please refer to equivalent in
 <td>no</td>
 <td></td>
 <td><ul></ul></td>
-<td><div>The text to insert inside the marker lines. If it's an empty string, the marker lines will also be removed.</div></br>
+<td><div>The text to insert inside the marker lines. If it's missing or an empty string, the block will be removed as if <code>state</code> were specified to <code>absent</code>.</div></br>
 <div style="font-size: small;">aliases: content<div></td></tr>
 <tr>
 <td>create<br/><div style="font-size: small;"></div></td>
@@ -108,7 +108,7 @@ please refer to equivalent in
 <td>no</td>
 <td>EOF</td>
 <td><ul><li>EOF</li><li>*regex*</li></ul></td>
-<td><div>If specified, the block will be inserted after the last match of specified regular expression. A special value is available; <code>EOF</code> for inserting the block at the end of the file.  If specified regular expresion has no matches, EOF will be used instead.</div></td></tr>
+<td><div>If specified, the block will be inserted after the last match of specified regular expression. A special value is available; <code>EOF</code> for inserting the block at the end of the file.  If specified regular expresion has no matches, <code>EOF</code> will be used instead.</div></td></tr>
 <tr>
 <td>insertbefore<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -158,19 +158,28 @@ please refer to equivalent in
 <td><ul></ul></td>
 <td><div>user part of SELinux file context. Will default to system policy, if applicable. If set to <code>_default</code>, it will use the <code>user</code> portion of the policy if available</div></td></tr>
 <tr>
+<td>state<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>present</td>
+<td><ul><li>present</li><li>absent</li></ul></td>
+<td><div>Whether the block should be there or not.</div></td></tr>
+<tr>
 <td>validate<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>None</td>
 <td><ul></ul></td>
 <td><div>The validation command to run before copying into place. The path to the file to validate is passed in via '%s' which must be present as in the example below. The command is passed securely so shell features like expansion and pipes won't work.</div></td></tr>
 </table>
-</br>
 
 ### Examples
 
 ```yaml
 - name: insert/update "Match User" configuation block in /etc/ssh/sshd_config
-  blockinfile: dest=/etc/ssh/sshd_config block="Match User ansible-agent\nPasswordAuthentication no"
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    block: |
+      Match User ansible-agent
+      PasswordAuthentication no
 ```
 
 ```yaml
