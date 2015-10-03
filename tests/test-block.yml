@@ -2,7 +2,7 @@
   vars:
     - testing_dir: "{{playbook_dir}}/testing"
   roles:
-    - ../..
+    - yaegashi.blockinfile
   tasks:
     - name: insert a block using block
       blockinfile:

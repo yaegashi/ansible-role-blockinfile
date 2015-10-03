@@ -2,7 +2,7 @@
   vars:
     - testing_dir: "{{playbook_dir}}/testing"
   roles:
-    - ../..
+    - yaegashi.blockinfile
   tasks:
     - shell: echo "Detected Ansible prior to 1.8" > {{testing_dir}}/SKIPPED
              && false
