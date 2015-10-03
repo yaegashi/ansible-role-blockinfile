@@ -1,0 +1,32 @@
+- hosts: localhost
+  vars:
+    - testing_dir: "{{playbook_dir}}/testing"
+  roles:
+    - yaegashi.blockinfile
+  tasks:
+    - name: insert block without state
+      blockinfile:
+        dest: "{{testing_dir}}/insert.txt"
+        backup: yes
+        block: aaa bbb ccc
+    - name: remove block without state
+      blockinfile:
+        dest: "{{testing_dir}}/remove.txt"
+        backup: yes
+    - name: insert block with state=present
+      blockinfile:
+        dest: "{{testing_dir}}/insert-present.txt"
+        backup: yes
+        block: aaa bbb ccc
+        state: present
+    - name: remove block with state=present
+      blockinfile:
+        dest: "{{testing_dir}}/remove-present.txt"
+        backup: yes
+        state: present
+    - name: remove block with state=absent
+      blockinfile:
+        dest: "{{testing_dir}}/remove-absent.txt"
+        backup: yes
+        block: aaa bbb ccc
+        state: absent
