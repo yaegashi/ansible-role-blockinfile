@@ -222,6 +222,9 @@ def main():
     marker0 = re.sub(r'{mark}', 'BEGIN', marker)
     marker1 = re.sub(r'{mark}', 'END', marker)
     if present and block:
+        # Escape seqeuences like '\n' need to be handled in Ansible 1.x
+        if ANSIBLE_VERSION.startswith('1.'):
+            block = re.sub('', block, '')
         blocklines = [marker0] + block.splitlines() + [marker1]
     else:
         blocklines = []
