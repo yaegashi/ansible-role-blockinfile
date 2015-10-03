@@ -34,15 +34,20 @@ short_description: Insert/update/remove a text block
                    surrounded by marker lines.
 version_added: '2.0'
 description:
-  - 'This module will insert/update/remove a block of multi-line text
-    surrounded by customizable marker lines
-    (default: "# {BEGIN/END} ANSIBLE MANAGED BLOCK").'
+  - This module will insert/update/remove a block of multi-line text
+    surrounded by customizable marker lines.
 options:
   dest:
     aliases: [ name, destfile ]
     required: true
     description:
       - The file to modify.
+  state:
+    required: false
+    choices: [ present, absent ]
+    default: present
+    description:
+      - Whether the block should be there or not.
   marker:
     required: false
     default: '# {mark} ANSIBLE MANAGED BLOCK'
@@ -55,7 +60,8 @@ options:
     default: ''
     description:
       - The text to insert inside the marker lines.
-        If it's an empty string, the marker lines will also be removed.
+        If it's missing or an empty string,
+        the block will be removed as if C(state) were specified to C(absent).
   insertafter:
     required: false
     default: EOF
@@ -63,7 +69,7 @@ options:
       - If specified, the block will be inserted after the last match of
         specified regular expression. A special value is available; C(EOF) for
         inserting the block at the end of the file.  If specified regular
-        expresion has no matches, EOF will be used instead.
+        expresion has no matches, C(EOF) will be used instead.
     choices: [ 'EOF', '*regex*' ]
   insertbefore:
     required: false
@@ -92,7 +98,11 @@ options:
 
 EXAMPLES = r"""
 - name: insert/update "Match User" configuation block in /etc/ssh/sshd_config
-  blockinfile: dest=/etc/ssh/sshd_config block="Match User ansible-agent\nPasswordAuthentication no"
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    block: |
+      Match User ansible-agent
+      PasswordAuthentication no
 
 - name: insert/update eth0 configuration stanza in /etc/network/interfaces
         (it might be better to copy files into /etc/network/interfaces.d/)
@@ -119,10 +129,11 @@ EXAMPLES = r"""
     content: ""
 """
 
-def write_changes(module,contents,dest):
+
+def write_changes(module, contents, dest):
 
     tmpfd, tmpfile = tempfile.mkstemp()
-    f = os.fdopen(tmpfd,'wb')
+    f = os.fdopen(tmpfd, 'wb')
     f.write(contents)
     f.close()
 
@@ -135,9 +146,10 @@ def write_changes(module,contents,dest):
         valid = rc == 0
         if rc != 0:
             module.fail_json(msg='failed to validate: '
-                                 'rc:%s error:%s' % (rc,err))
+                                 'rc:%s error:%s' % (rc, err))
     if valid:
         module.atomic_move(tmpfile, dest)
+
 
 def check_file_attrs(module, changed, message):
 
@@ -151,10 +163,12 @@ def check_file_attrs(module, changed, message):
 
     return message, changed
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             dest=dict(required=True, aliases=['name', 'destfile']),
+            state=dict(default='present', choices=['absent', 'present']),
             marker=dict(default='# {mark} ANSIBLE MANAGED BLOCK', type='str'),
             block=dict(default='', type='str', aliases=['content']),
             insertafter=dict(default=None),
@@ -174,11 +188,13 @@ def main():
         dest = os.path.realpath(dest)
 
     if os.path.isdir(dest):
-        module.fail_json(rc=256, msg='Destination %s is a directory !' % dest)
+        module.fail_json(rc=256,
+                         msg='Destination %s is a directory !' % dest)
 
     if not os.path.exists(dest):
         if not module.boolean(params['create']):
-            module.fail_json(rc=257, msg='Destination %s does not exist !' % dest)
+            module.fail_json(rc=257,
+                             msg='Destination %s does not exist !' % dest)
         original = None
         lines = []
     else:
@@ -191,6 +207,7 @@ def main():
     insertafter = params['insertafter']
     block = params['block']
     marker = params['marker']
+    present = params['state'] == 'present'
 
     if insertbefore is None and insertafter is None:
         insertafter = 'EOF'
@@ -202,32 +219,34 @@ def main():
     else:
         insertre = None
 
-    marker0 = re.sub(r'{mark}', 'BEGIN', marker, 0)
-    marker1 = re.sub(r'{mark}', 'END', marker, 0)
-    if block in (None, ''):
-        blocklines = []
-    else:
-        block = re.sub('', block, '', 0)
+    marker0 = re.sub(r'{mark}', 'BEGIN', marker)
+    marker1 = re.sub(r'{mark}', 'END', marker)
+    if present and block:
         blocklines = [marker0] + block.splitlines() + [marker1]
+    else:
+        blocklines = []
 
     n0 = n1 = None
     for i, line in enumerate(lines):
-        if line.startswith(marker0): n0 = i
-        if line.startswith(marker1): n1 = i
+        if line.startswith(marker0):
+            n0 = i
+        if line.startswith(marker1):
+            n1 = i
 
     if None in (n0, n1):
         n0 = None
         if insertre is not None:
             for i, line in enumerate(lines):
-                if insertre.search(line): n0 = i
+                if insertre.search(line):
+                    n0 = i
             if n0 is None:
                 n0 = len(lines)
             elif insertafter is not None:
                 n0 += 1
         elif insertbefore is not None:
-            n0 = 0          # insertbefore=BOF
+            n0 = 0           # insertbefore=BOF
         else:
-            n0 = len(lines) # insertafter=EOF
+            n0 = len(lines)  # insertafter=EOF
     elif n0 < n1:
         lines[n0:n1+1] = []
     else:
