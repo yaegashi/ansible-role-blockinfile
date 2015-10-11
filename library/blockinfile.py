@@ -36,6 +36,8 @@ version_added: '2.0'
 description:
   - This module will insert/update/remove a block of multi-line text
     surrounded by customizable marker lines.
+notes:
+  - This module supports check mode.
 options:
   dest:
     aliases: [ name, destfile ]
