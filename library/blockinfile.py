@@ -75,7 +75,7 @@ options:
     choices: [ 'EOF', '*regex*' ]
   insertbefore:
     required: false
-    default: null
+    default: None
     description:
       - If specified, the block will be inserted before the last match of
         specified regular expression. A special value is available; C(BOF) for
